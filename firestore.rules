@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/kullanicilar/$(request.auth.uid)).data.rol == 'admin';
+    }
+
+    // kullanicilar/{uid} -> { email, isim, rol }
+    match /kullanicilar/{userId} {
+      // Herkes (giriş yapmış) kullanıcı listesini okuyabilir
+      // (kullanıcı dropdown'u ve isim eşleştirmesi için gerekli).
+      allow read: if isSignedIn();
+
+      // Kayıt olan kullanıcı SADECE kendi dokümanını oluşturabilir.
+      allow create: if isSignedIn() && request.auth.uid == userId;
+
+      // Rol değiştirme / silme sadece admin.
+      allow update, delete: if isAdmin();
+    }
+
+    // gorevler/{taskId} -> { title, assignee, time, duration, status }
+    match /gorevler/{taskId} {
+      allow read: if isSignedIn();
+
+      // Görev oluşturma sadece admin.
+      allow create: if isAdmin();
+
+      // Durum güncellemesi (tamamlandi/kacirildi) kullanıcıin kendisi
+      // yapabilsin diye şimdilik tüm signed-in kullanıcılara açık.
+      // NOT: assignee alanı isim (string) tuttuğu için "sadece kendi
+      // görevini güncelleyebilir" kısıtını burada güvenli şekilde
+      // yazamıyoruz. İleride assignee alanını UID'ye çevirirsen
+      // aşağıdaki satırla değiştir:
+      // allow update: if isSignedIn() &&
+      //   resource.data.assignee == request.auth.uid;
+      allow update: if isSignedIn();
+
+      allow delete: if isAdmin();
+    }
+  }
+}

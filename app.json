@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Görev Takip",
+    "slug": "gorev-takip-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#121824",
+    "splash": {
+      "backgroundColor": "#121824"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "QR kod okutarak görevi tamamlamak için kameraya erişim gereklidir."
+      }
+    },
+    "android": {
+      "permissions": [
+        "CAMERA"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#121824"
+      }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "QR kod okutarak görevi tamamlamak için kameraya erişim gereklidir."
+        }
+      ],
+      "@react-native-community/datetimepicker"
+    ]
+  }
+}
